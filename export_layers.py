@@ -9,28 +9,43 @@ import tempfile
 import shutil
 import copy
 
+def logger(msg):
+    with open(os.path.join(os.path.expanduser("~"), "layer_export.log"), "a") as myfile:
+        myfile.write(str(msg) + "\n")
+
+class ExportLayer(object):
+    def __init__(self):
+        self.id = None
+        self.name = None
+        self.fixed = False       
+
+    def __repr__(self):
+        output = ["{}:{}".format(k,v) for (k,v) in self.__dict__.iteritems()]
+        return " ".join(output)
 
 class PNGExport(inkex.Effect):
     def __init__(self):
-        """init the effetc library and get options from gui"""
+        """init the effect library and get options from gui"""
         inkex.Effect.__init__(self)
         self.OptionParser.add_option("--path", action="store", type="string", dest="path", default="~/", help="")
         self.OptionParser.add_option('-f', '--filetype', action='store', type='string', dest='filetype', default='jpeg', help='Exported file type')
         self.OptionParser.add_option("--crop", action="store", type="inkbool", dest="crop", default=False)
+        self.OptionParser.add_option("--enum", action="store", type="inkbool", dest="enum", default=False)
         self.OptionParser.add_option("--dpi", action="store", type="float", dest="dpi", default=90.0)
 
     def effect(self):
         output_path = os.path.expanduser(self.options.path)
         curfile = self.args[-1]
         layers = self.get_layers(curfile)
-        counter = 1
 
-        for (layer_id, layer_label, layer_type) in layers:
-            if layer_type == "fixed":
+
+        for layer in layers:
+#            logger(layer)
+            if layer.fixed:
                 continue
 
-            show_layer_ids = [layer[0] for layer in layers if layer[2] == "fixed" or layer[0] == layer_id]
-
+            show_layer_ids = [l.id for l in layers if l.fixed or l.id == layer.id]
+            
             if not os.path.exists(os.path.join(output_path)):
                 os.makedirs(os.path.join(output_path))
 
@@ -38,16 +53,16 @@ class PNGExport(inkex.Effect):
                 layer_dest_svg_path = fp_svg.name
                 self.export_layers(layer_dest_svg_path, show_layer_ids)
 
+                layer_dest_path = os.path.join(output_path, layer.name)
+
                 if self.options.filetype == "jpeg":
                     with tempfile.NamedTemporaryFile() as fp_png:
                         self.exportToPng(layer_dest_svg_path, fp_png.name)
-                        layer_dest_jpg_path = os.path.join(output_path, "%s_%s.jpg" % (str(counter).zfill(3), layer_label))
-                        self.convertPngToJpg(fp_png.name, layer_dest_jpg_path)
+                        self.convertPngToJpg(fp_png.name, layer_dest_path + ".jpg")
                 else:
-                    layer_dest_png_path = os.path.join(output_path, "%s_%s.png" % (str(counter).zfill(3), layer_label))
-                    self.exportToPng(layer_dest_svg_path, layer_dest_png_path)
+                    self.exportToPng(layer_dest_svg_path, layer_dest_path + ".png")
 
-            counter += 1
+
 
     def export_layers(self, dest, show):
         """
@@ -69,32 +84,31 @@ class PNGExport(inkex.Effect):
         svg_layers = self.document.xpath('//svg:g[@inkscape:groupmode="layer"]', namespaces=inkex.NSS)
         layers = []
 
-        for layer in svg_layers:
+        for i, layer in enumerate(svg_layers):
+
             label_attrib_name = "{%s}label" % layer.nsmap['inkscape']
             if label_attrib_name not in layer.attrib:
                 continue
 
-            layer_id = layer.attrib["id"]
-            layer_label = layer.attrib[label_attrib_name]
+            exp_layer = ExportLayer()
+            exp_layer.name = layer.attrib[label_attrib_name]
+            exp_layer.id = layer.attrib["id"]
 
-            if layer_label.lower().startswith("[fixed] "):
-                layer_type = "fixed"
-                layer_label = layer_label[8:]
-            elif layer_label.lower().startswith("[export] "):
-                layer_type = "export"
-                layer_label = layer_label[9:]
+            if exp_layer.name.lower().startswith("[fixed] "):
+                exp_layer.fixed = True
+                exp_layer.name = exp_layer.name[8:]
             else:
-                continue
+                if self.options.enum:
+                    exp_layer.name = "{}_{}".format(str(i).zfill(3), exp_layer.name)    
 
-            layers.append([layer_id, layer_label, layer_type])
-
+            layers.append(exp_layer)
         return layers
 
     def exportToPng(self, svg_path, output_path):
         area_param = '-D' if self.options.crop else 'C'
-        command = "inkscape %s -d %s -e \"%s\" \"%s\"" % (area_param, self.options.dpi, output_path, svg_path)
-
-        p = subprocess.Popen(command.encode("utf-8"), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        command = ['inkscape', area_param, '-d', self.options.dpi,'-e', output_path, svg_path]
+        str_command = ["{}".format(s) for s in command]
+        p = subprocess.Popen(str_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         p.wait()
 
     def convertPngToJpg(self, png_path, output_path):
