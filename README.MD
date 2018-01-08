@@ -7,7 +7,7 @@ Based on Johann Woelper's fork of the original extension from Jesús Espino and 
 ## How it works
 Copy `export_9_patch.inx` and `export_9_patch.inx` into Inkscape's extension directory:
 
-- On Linux: `$HOME/.config/inkscape/extensions/`.
+- On Linux: `$HOME/.config/inkscape/extensions/`
 - On Mac: `/Applications/Inkscape.app/Contents/Resources/share/inkscape/extensions/`
 - On Windows: `C:\Users\<User>\AppData\Roaming\inkscape\extensions`
 
