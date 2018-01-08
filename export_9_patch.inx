@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<inkscape-extension xmlns="http://www.inkscape.org/namespace/inkscape/extension">
+    <_name>Export 9-patch PNGs</_name>
+    <id>com.github.mitchcurtis.inkscape.9.patch.export</id>
+    <dependency type="executable" location="extensions">export_9_patch.py</dependency>
+    <param name="help" type="description" xml:space="preserve">Export each top-level layer as a PNG file.
+
+Layers with a "[9] " prefix will be exported with a .9.png extension. For example, "[9] button-background" will be exported as "button-background.9.png".
+    </param>
+    <param name="dir" type="string" _gui-text="Output directory">~/</param>
+<!--    <param name="crop" type="boolean" _gui-text="Crop to bounds?">true</param>-->
+    <param name="basedpi" type="float" min="0.0" max="1000.0" _gui-text="Export DPI" _gui-description="The base DPI; the high DPI options below are multiplied by this value">90</param>
+    <param name="dpi2" type="boolean" _gui-text="Export @2x" _gui-description="e.g. button-background@2x.9.png">false</param>
+    <param name="dpi3" type="boolean" _gui-text="Export @3x" _gui-description="e.g. button-background@3x.9.png">false</param>
+    <param name="dpi4" type="boolean" _gui-text="Export @4x" _gui-description="e.g. button-background@4x.9.png">false</param>
+    <effect needs-live-preview="false">
+        <object-type>all</object-type>
+        <effects-menu>
+            <submenu _name="Export" />
+        </effects-menu>
+    </effect>
+    <script>
+        <command reldir="extensions" interpreter="python">export_9_patch.py</command>
+    </script>
+</inkscape-extension>
