@@ -5,7 +5,11 @@ This is an Inkscape extension that exports each top-level layer in a SVG as PNG 
 Based on Johann Woelper's fork of the original extension from Jesús Espino and Xavier Julian.
 
 ## How it works
-Copy `export_9_patch.inx` and `export_9_patch.inx` into `$HOME/.config/inkscape/extensions/`.
+Copy `export_9_patch.inx` and `export_9_patch.inx` into Inkscape's extension directory:
+
+- On Linux: `$HOME/.config/inkscape/extensions/`.
+- On Mac: `/Applications/Inkscape.app/Contents/Resources/share/inkscape/extensions/`
+- On Windows: `C:\Users\<User>\AppData\Roaming\inkscape\extensions`
 
 This extension will export each top-level layer into a PNG image whose filename is the layer's name. The exported area is the drawing (not page), i.e. the bounding box of all objects in the layer. The exported image will display all of the visible objects in the layer without margins or cropping.
 
