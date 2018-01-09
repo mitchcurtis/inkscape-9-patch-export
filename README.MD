@@ -1,6 +1,6 @@
 # Inkscape 9-patch Export Extension
 
-This is an Inkscape extension that exports each top-level layer in a SVG as PNG images.
+This is an Inkscape extension that exports each top-level layer in an SVG as PNG images.
 
 Based on Johann Woelper's fork of the original extension from Jesús Espino and Xavier Julian.
 
