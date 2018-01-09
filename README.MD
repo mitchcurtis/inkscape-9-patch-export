@@ -30,10 +30,24 @@ To use the extension:
 If you have an asset that doesn't have 9-patch lines on every side, it can be useful to either:
 
 - Add an unfilled rectangle behind the entire asset, or;
-- Add a 1x1 unfilled rectangle where necessary
+- Add a 1 x 1 unfilled rectangle where necessary
 
 This ensures that the bounds will leave the space for the missing 9-patch lines. For example:
 
 ![9-patch example](https://github.com/mitchcurtis/inkscape-9-patch-export/blob/master/doc/images/9-patch-1-pixel.png)
 
-After being made transparent (unfilled), the 1 pixel rectangle on the bottom right corner ensures that there are one pixel gaps on the sides of the image.
+After being made transparent (unfilled), the 1 pixel rectangle on the bottom right corner ensures that there are one pixel gaps on the sides of the image. If the above 50 x 32 button is exported @4x, the resulting image will look like this:
+
+![9-patch export example](https://github.com/mitchcurtis/inkscape-9-patch-export/blob/master/doc/images/button-background@4x.9.png)
+
+At 4 times the size, the button itself will be 200 x 128, but since the 9-patch lines are included in the bounds, it becomes 208 x 136 (4 pixels top, 4 pixels bottom, etc.). The 9-patch system requires one pixel thick lines, and so these will need to be trimmed. The simplest way to trim images in bulk is to use imagemagick:
+
+- For @2x images: `convert *@2x.9.png -shave 1x1 *@2x.9.png`
+- For @3x images: `convert *@3x.9.png -shave 2x2 *@3x.9.png`
+- For @4x images: `convert *@4x.9.png -shave 3x3 *@4x.9.png`
+
+The image above will look like this once fixed:
+
+![9-patch export fixed example](https://github.com/mitchcurtis/inkscape-9-patch-export/blob/master/doc/images/button-background@4x.9-fixed.png)
+
+Alternatively, if you're using the assets with Qt Quick Controls 2's [Imagine Style](https://doc.qt.io/qt-5.10/qtquickcontrols2-styles.html#imagine-style), you can use the [testbench tool](https://github.com/qt/qtquickcontrols2/tree/5.10/tests/manual/testbench) to preview and fix the assets for you.
