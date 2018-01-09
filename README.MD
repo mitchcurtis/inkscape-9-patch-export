@@ -24,3 +24,16 @@ To use the extension:
 2. Provide the path to the output directory where the images should be saved to (Inkscape's extension system does not allow file dialogs, unfortunately).
 3. Choose the DPI variants that should be exported.
 4. Click OK.
+
+## 9-patch Tips
+
+If you have an asset that doesn't have 9-patch lines on every side, it can be useful to either:
+
+- Add an unfilled rectangle behind the entire asset, or;
+- Add a 1x1 unfilled rectangle where necessary
+
+This ensures that the bounds will leave the space for the missing 9-patch lines. For example:
+
+![9-patch example](https://github.com/mitchcurtis/inkscape-9-patch-export/blob/master/doc/images/9-patch-1-pixel.png)
+
+After being made transparent (unfilled), the 1 pixel rectangle on the bottom right corner ensures that there are one pixel gaps on the sides of the image.
