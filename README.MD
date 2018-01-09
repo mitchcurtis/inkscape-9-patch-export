@@ -23,7 +23,7 @@ To use the extension:
 1. Open the extension's dialog via **Extensions > Export > Export 9-patch PNGs...**
 2. Provide the path to the output directory where the images should be saved to (Inkscape's extension system does not allow file dialogs, unfortunately).
 3. Choose the DPI variants that should be exported.
-4. Click OK.
+4. Click Apply.
 
 ## 9-patch Tips
 
