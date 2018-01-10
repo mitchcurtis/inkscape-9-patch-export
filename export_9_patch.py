@@ -26,7 +26,6 @@ class PNGExport(inkex.Effect):
         # init the effect library and get options from gui
         inkex.Effect.__init__(self)
         self.OptionParser.add_option("--dir", action="store", type="string", dest="dir", default="~/", help="")
-#        self.OptionParser.add_option("--crop", action="store", type="inkbool", dest="crop", default=True)
         self.OptionParser.add_option("--basedpi", action="store", type="float", dest="basedpi", default=90.0)
         self.OptionParser.add_option("--dpi2", action="store", type="inkbool", dest="dpi2", default=False)
         self.OptionParser.add_option("--dpi3", action="store", type="inkbool", dest="dpi3", default=False)
@@ -49,20 +48,26 @@ class PNGExport(inkex.Effect):
             if not os.path.exists(os.path.join(outputDirPath)):
                 os.makedirs(os.path.join(outputDirPath))
 
-            with tempfile.NamedTemporaryFile() as fpSvg:
-                layerDestSvgPath = fpSvg.name
-                self.exportLayers(layerDestSvgPath, showLayerIds)
+            fd, tmpLayerDestSvgPath = tempfile.mkstemp()
+            try:
+                # https://stackoverflow.com/a/38437203/904422
+                # use a context manager to open the file at that path and close it again
+                with open(tmpLayerDestSvgPath, 'w') as f:
+                    self.exportLayers(tmpLayerDestSvgPath, showLayerIds)
+
+                # close the file descriptor
+                os.close(fd)
 
                 layerDestPath = os.path.join(outputDirPath, layer.name)
 
-                self.exportToPng(layerDestSvgPath, layerDestPath, layer.ninePatch)
-
+                self.exportToPng(tmpLayerDestSvgPath, layerDestPath, layer.ninePatch)
+            finally:
+                os.remove(tmpLayerDestSvgPath)
 
 
     def exportLayers(self, dest, show):
         # Export selected layers of SVG to the file `dest`.
         # :arg  str   dest:  path to export SVG file.
-        # :arg  list  hide:  layers to hide. each element is a string.
         # :arg  list  show:  layers to show. each element is a string.
         doc = copy.deepcopy(self.document)
         for layer in doc.xpath('//svg:g[@inkscape:groupmode="layer"]', namespaces=inkex.NSS):
@@ -77,13 +82,7 @@ class PNGExport(inkex.Effect):
         svgLayers = self.document.xpath('//svg:g[@inkscape:groupmode="layer"]', namespaces=inkex.NSS)
         layers = []
 
-        logging.basicConfig(level=logging.INFO)
-        logger = logging.getLogger(__name__)
-
         for i, layer in enumerate(svgLayers):
-#            stuff = { "layer": layer.attrib, "i": i }
-#            logger.info("Layer %s", stuff);
-
             labelAttribName = "{%s}label" % layer.nsmap['inkscape']
             if labelAttribName not in layer.attrib:
                 continue
@@ -91,10 +90,6 @@ class PNGExport(inkex.Effect):
             expLayer = ExportLayer()
             expLayer.name = layer.attrib[labelAttribName]
             expLayer.id = layer.attrib["id"]
-
-#            if expLayer.name.lower().startswith("[fixed] "):
-#                expLayer.fixed = True
-#                expLayer.name = expLayer.name[8:]
 
             if expLayer.name.lower().startswith("[9] "):
                 expLayer.ninePatch = True
@@ -123,12 +118,8 @@ class PNGExport(inkex.Effect):
             outputPath += ".9"
         outputPath += ".png"
 
-        # If the 'Crop to bounds' option was checked, crop to the drawing.
-        # Otherwise, crop to the page.
-#        area_param = '-D' if self.options.crop else 'C'
-        area_param = '-D'
         finalDpi = self.options.basedpi * multiplier
-        command = ['inkscape', area_param, '-d', finalDpi,'-e', outputPath, svgPath]
+        command = ['inkscape', '-D', '-d', finalDpi,'-e', outputPath, svgPath]
         strCommand = ["{}".format(s) for s in command]
         p = subprocess.Popen(strCommand, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         p.wait()

@@ -8,7 +8,6 @@
 Layers with a "[9] " prefix will be exported with a .9.png extension. For example, "[9] button-background" will be exported as "button-background.9.png".
     </param>
     <param name="dir" type="string" _gui-text="Output directory">~/</param>
-<!--    <param name="crop" type="boolean" _gui-text="Crop to bounds?">true</param>-->
     <param name="basedpi" type="float" min="0.0" max="1000.0" _gui-text="Export DPI" _gui-description="The base DPI; the high DPI options below are multiplied by this value">90</param>
     <param name="dpi2" type="boolean" _gui-text="Export @2x" _gui-description="e.g. button-background@2x.9.png">false</param>
     <param name="dpi3" type="boolean" _gui-text="Export @3x" _gui-description="e.g. button-background@3x.9.png">false</param>
