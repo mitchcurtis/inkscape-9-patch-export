@@ -87,11 +87,15 @@ class PNGExport(inkex.Effect):
             if labelAttribName not in layer.attrib:
                 continue
 
+            layerName = layer.attrib[labelAttribName]
+            if layerName.lower().startswith("[noexport] "):
+                continue
+
             expLayer = ExportLayer()
-            expLayer.name = layer.attrib[labelAttribName]
+            expLayer.name = layerName
             expLayer.id = layer.attrib["id"]
 
-            if expLayer.name.lower().startswith("[9] "):
+            if expLayer.name.startswith("[9] "):
                 expLayer.ninePatch = True
                 expLayer.name = expLayer.name[4:]
 

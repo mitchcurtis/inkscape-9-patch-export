@@ -15,6 +15,8 @@ This extension will export each top-level layer into a PNG image whose filename 
 
 Layers with a `[9] ` prefix will be exported with a `.9.png` extension. For example, `[9] button-background` will be exported as `button-background.9.png`.
 
+Layers with a `[NoExport] ` prefix will not be exported.
+
 There are also options to export the layer in certain high DPI variants. The resulting images will contain the DPI as a suffix; e.g. `button-background@2x.9.png`.
 
 ## Using it
