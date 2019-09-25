@@ -5,7 +5,7 @@ This is an Inkscape extension that exports each top-level layer in an SVG as PNG
 Based on Johann Woelper's fork of the original extension from Jesús Espino and Xavier Julian.
 
 ## How it works
-Copy `export_9_patch.inx` and `export_9_patch.inx` into Inkscape's extension directory:
+Copy `export_9_patch.inx` and `export_9_patch.py` into Inkscape's extension directory:
 
 - On Linux: `$HOME/.config/inkscape/extensions/`
 - On Mac: `/Applications/Inkscape.app/Contents/Resources/share/inkscape/extensions/`
