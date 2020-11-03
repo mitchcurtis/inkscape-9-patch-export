@@ -25,15 +25,15 @@ class PNGExport(inkex.Effect):
     def __init__(self):
         # init the effect library and get options from gui
         inkex.Effect.__init__(self)
-        self.OptionParser.add_option("--dir", action="store", type="string", dest="dir", default="~/", help="")
-        self.OptionParser.add_option("--basedpi", action="store", type="float", dest="basedpi", default=90.0)
-        self.OptionParser.add_option("--dpi2", action="store", type="inkbool", dest="dpi2", default=False)
-        self.OptionParser.add_option("--dpi3", action="store", type="inkbool", dest="dpi3", default=False)
-        self.OptionParser.add_option("--dpi4", action="store", type="inkbool", dest="dpi4", default=False)
+        self.arg_parser.add_argument("--dir", action="store", dest="dir", default="~/", help="")
+        self.arg_parser.add_argument("--basedpi", action="store", type=float, dest="basedpi", default=90.0)
+        self.arg_parser.add_argument("--dpi2", action="store", type=inkex.Boolean, dest="dpi2", default=False)
+        self.arg_parser.add_argument("--dpi3", action="store", type=inkex.Boolean, dest="dpi3", default=False)
+        self.arg_parser.add_argument("--dpi4", action="store", type=inkex.Boolean, dest="dpi4", default=False)
 
     def effect(self):
         outputDirPath = os.path.expanduser(self.options.dir)
-        curfile = self.args[-1]
+        curfile = self.options.input_file
         layers = self.getLayers(curfile)
 
         for layer in layers:
@@ -123,14 +123,14 @@ class PNGExport(inkex.Effect):
         outputPath += ".png"
 
         finalDpi = self.options.basedpi * multiplier
-        command = ['inkscape', '-D', '-d', finalDpi,'-e', outputPath, svgPath]
+        command = ['inkscape', '-D', '-d', finalDpi, '-o', outputPath, svgPath]
         strCommand = ["{}".format(s) for s in command]
         p = subprocess.Popen(strCommand, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        p.wait()
+        p.communicate()
 
 def _main():
     e = PNGExport()
-    e.affect()
+    e.run()
     exit()
 
 if __name__ == "__main__":
